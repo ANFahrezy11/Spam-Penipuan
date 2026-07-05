@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI SMS Spam Detector</title>
+    <style>
+        body {
+            background-color: #050508;
+            color: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.08) 0%, transparent 40%);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1000px;
+            width: 90%;
+            background: rgba(15, 15, 25, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .robot-section {
+            flex: 1;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .robot-svg {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+        }
+
+        .eye {
+            transition: transform 0.1s ease-out;
+            transform-origin: center;
+        }
+
+        .robot-section h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            letter-spacing: 3px;
+            background: linear-gradient(180deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .robot-section p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .app-section {
+            flex: 1.2;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .app-section h2 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .btn-sample {
+            background: rgba(255, 255, 255, 0.04);
+            color: #ccc;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sample:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            padding: 15px;
+            font-size: 14px;
+            resize: none;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-analyze {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .btn-analyze:hover {
+            background: #dddddd;
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            margin-top: 22px;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+
+        .result-box p {
+            margin: 6px 0;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .result-box strong {
+            color: #ffffff;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .robot-section {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Bagian Robot Kiri -->
+        <div class="robot-section">
+            <svg class="robot-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" id="robotInstance">
+                <defs>
+                    <linearGradient id="robotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2a2a35;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0a0a10;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect x="25" y="20" width="50" height="45" rx="20" fill="url(#robotGrad)" stroke="rgba(255,255,255,0.2)"
+                    stroke-width="1.5" />
+                <rect x="32" y="30" width="36" height="18" rx="8" fill="#000" />
+
+                <circle id="leftEye" class="eye" cx="43" cy="39" r="2.5" fill="#fff" />
+                <circle id="rightEye" class="eye" cx="57" cy="39" r="2.5" fill="#fff" />
+
+                <rect x="44" y="65" width="12" height="10" rx="2" fill="#151520" />
+                <path d="M 20,85 C 20,78 30,75 50,75 C 70,75 80,78 80,85 L 80,100 L 20,100 Z" fill="url(#robotGrad)" />
+            </svg>
+            <h1>SAFETY</h1>
+            <p>Spam And Fraud Evaluation Technology</p>
+        </div>
+
+        <!-- Bagian Aplikasi Kanan -->
+        <div class="app-section">
+            <h2>SMS Evaluation Panel</h2>
+
+            <div class="btn-group">
+                <button class="btn-sample"
+                    onclick="isiContoh('Paket Anda dengan nomor resi JX123456789 sedang dalam perjalanan. Estimasi pengiriman hari ini sebelum pukul 17.00 WIB.')">📋
+                    Contoh 1: Resi Pengiriman (Aman)</button>
+                <button class="btn-sample"
+                    onclick="isiContoh('Selamat, Anda dinyatakan lulus seleksi tahap pertama program beasiswa. Informasi selengkapnya dapat dilihat melalui portal resmi kampus.')">🎓
+                    Contoh 2: Kelulusan Kampus (Aman)</button>
+                <button class="btn-sample"
+                    onclick="isiContoh('PROMO BESAR! Kuota internet giga hits diskon up to 50% khusus hari ini, cek aplikasi sekarang!')">💛
+                    Contoh 3: Penawaran Paket Internet (Waspada)</button>
+                <button class="btn-sample"
+                    onclick="isiContoh('INFO RESMI: Selamat Anda terpilih mendapatkan Hadiah Kejutan Mobil dari Shopee. Klik bit.ly/menang-shphbd')">⚠️
+                    Contoh 4: Penipuan Undian (Bahaya)</button>
+            </div>
+
+            <textarea id="smsInput" placeholder="Ketik atau tempel isi SMS di sini..."></textarea>
+            <button class="btn-analyze" onclick="analyzeSMS()">Analisis Keamanan Pesan</button>
+
+            <div id="resultCard" class="result-box">
+                <p>Status Klarifikasi Keamanan:<br><strong id="resLabel"></strong></p>
+                <p style="margin-top: 15px;">Tingkat Akurasi Evaluasi AI:<br><strong id="resConfidence"></strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function isiContoh(teks) {
+            document.getElementById('smsInput').value = teks;
+        }
+
+        const leftEye = document.getElementById('leftEye');
+        const rightEye = document.getElementById('rightEye');
+        const robotSvg = document.getElementById('robotInstance');
+
+        document.addEventListener('mousemove', (e) => {
+            if (!robotSvg) return;
+
+            const rect = robotSvg.getBoundingClientRect();
+            const robotCenterX = rect.left + rect.width / 2;
+            const robotCenterY = rect.top + rect.height / 2;
+
+            const angle = Math.atan2(e.clientY - robotCenterY, e.clientX - robotCenterX);
+            const maxDistance = 4;
+            const moveX = Math.cos(angle) * maxDistance;
+            const moveY = Math.sin(angle) * maxDistance;
+
+            leftEye.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            rightEye.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+
+        async function analyzeSMS() {
+            const textInput = document.getElementById('smsInput').value;
+            if (!textInput.trim()) {
+                alert('Silakan masukkan atau pilih teks SMS dulu!');
+                return;
+            }
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sms_text: textInput })
+            });
+
+            const data = await response.json();
+
+            document.getElementById('resultCard').style.display = 'block';
+            document.getElementById('resLabel').innerText = data.label;
+            document.getElementById('resConfidence').innerText = data.confidence;
+        }
+    </script>
+</body>
+
+</html>
